@@ -22,3 +22,7 @@ npm-debug.log*
 .idea/
 .vscode/
 *.swp
+
+# User-uploaded food photos (keep local, never publish them)
+client/public/uploads/*
+!client/public/uploads/.gitkeep
