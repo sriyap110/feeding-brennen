@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Feeding Brennen',
-  description: 'Track restaurants, visits, and spending.',
+  title: "Brennen's Table Diary",
+  description: 'A journal of memorable meals, favorite plates, and shared ratings.',
 };
 
 export default function RootLayout({
@@ -13,13 +13,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen">
-        <header className="border-b border-gray-200 bg-white">
-          <div className="mx-auto max-w-3xl px-6 py-4">
-            <h1 className="text-xl font-semibold">Feeding Brennen</h1>
+      <body>
+        <header className="site-header">
+          <div className="header-inner">
+            <a href="#top" className="wordmark">feeding<br /><em>Brennen</em></a>
+            <nav aria-label="Main navigation"><a href="#photos">Favorite plates</a><a href="#visits">Meal log</a></nav>
           </div>
         </header>
-        <main className="mx-auto max-w-3xl px-6 py-8">{children}</main>
+        <main id="top">{children}</main>
+        <footer><span>Made with full plates &amp; good company.</span><span>Los Angeles · 2026</span></footer>
       </body>
     </html>
   );

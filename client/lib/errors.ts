@@ -1,5 +1,17 @@
 import { NextResponse } from 'next/server';
 
+export class ApiError extends Error {
+  constructor(
+    public readonly status: number,
+    message: string
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
+
+type DatabaseError = Error & { code?: string };
+
 /**
  * Central error -> HTTP response mapper for the API route handlers. Call it
  * from a route's `catch` block so error handling lives in one place:
@@ -10,17 +22,30 @@ import { NextResponse } from 'next/server';
  *     return handleError(err);
  *   }
  *
- * This is a STUB. Right now it always returns a generic 500. A real
- * implementation would inspect the error (validation vs. not-found vs.
- * conflict vs. unexpected) and choose an appropriate status code and shape.
- *
- * This is task A3. The write endpoints from A2 can't return sensible 400s and
- * 404s while every failure funnels into a 500.
- *
- * TODO (A3): map known error types to proper status codes (400, 404, 409, ...)
- * TODO (A3): avoid leaking internal error details in responses
+ * Expected application and database errors become safe 4xx responses. Only
+ * unexpected failures are logged; their details never cross the API boundary.
  */
 export function handleError(err: unknown): NextResponse {
+  if (err instanceof ApiError) {
+    return NextResponse.json({ error: err.message }, { status: err.status });
+  }
+
+  if (err instanceof SyntaxError) {
+    return NextResponse.json({ error: 'Request body must be valid JSON' }, { status: 400 });
+  }
+
+  const databaseError = err as DatabaseError;
+  if (databaseError?.code === '23505') {
+    return NextResponse.json(
+      { error: 'A restaurant with that name already exists' },
+      { status: 409 }
+    );
+  }
+
+  if (databaseError?.code === '23503') {
+    return NextResponse.json({ error: 'Referenced record not found' }, { status: 404 });
+  }
+
   console.error('Unhandled API error:', err);
 
   return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

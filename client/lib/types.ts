@@ -47,6 +47,22 @@ export interface Visit {
   createdAt: string;
 }
 
+export interface VisitWithRestaurant extends Visit {
+  restaurantName: string;
+}
+
+export interface FoodPhoto {
+  id: number;
+  visitId: number;
+  imageUrl: string;
+  caption: string | null;
+  restaurantName: string;
+  visitDate: string;
+  averageRating: number | null;
+  ratingCount: number;
+  createdAt: string;
+}
+
 // --- row mappers -------------------------------------------------------------
 
 /** NUMERIC -> number, preserving null. */
@@ -92,6 +108,29 @@ export function toVisit(row: Record<string, unknown>): Visit {
     date: dateOnly(row.date),
     amountSpent: num(row.amountSpent),
     notes: (row.notes as string | null) ?? null,
+    createdAt: isoTimestamp(row.createdAt),
+  };
+}
+
+export function toVisitWithRestaurant(
+  row: Record<string, unknown>
+): VisitWithRestaurant {
+  return {
+    ...toVisit(row),
+    restaurantName: String(row.restaurantName),
+  };
+}
+
+export function toFoodPhoto(row: Record<string, unknown>): FoodPhoto {
+  return {
+    id: Number(row.id),
+    visitId: Number(row.visitId),
+    imageUrl: String(row.imageUrl),
+    caption: (row.caption as string | null) ?? null,
+    restaurantName: String(row.restaurantName),
+    visitDate: dateOnly(row.visitDate),
+    averageRating: num(row.averageRating),
+    ratingCount: Number(row.ratingCount),
     createdAt: isoTimestamp(row.createdAt),
   };
 }
